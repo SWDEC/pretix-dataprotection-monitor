@@ -1,0 +1,56 @@
+{% extends "pretixcontrol/base.html" %}
+{% load bootstrap3 %}
+{% block title %}{{ event.name }} · Data Protection Monitor{% endblock %}
+{% block content %}
+<p><a href="{% url 'plugins:pretix_dataprotection_monitor:dashboard' %}">Data Protection Monitor</a></p>
+<h1>{{ event.name }}</h1>
+<p>{{ event.organizer.name }} · Event #{{ event.pk }} · <strong>{{ status_label }}</strong>{% if excluded %} · Excluded{% endif %}</p>
+<p><a href="{{ shredder_url }}">Open pretix’s personal-data deletion page</a></p>
+{% if state.checked_at %}
+<p>Last checked {{ state.checked_at|date:"SHORT_DATETIME_FORMAT" }}. {% if state.event_end %}End {{ state.event_end|date:"SHORT_DATETIME_FORMAT" }}{% if state.inferred_end %} (inferred){% endif %}.{% endif %} {% if state.due_at %}Due {{ state.due_at|date:"SHORT_DATETIME_FORMAT" }}.{% endif %}</p>
+{% endif %}
+{% if state.error_code %}<div class="alert alert-warning">Audit error: {{ state.error_code }}</div>{% endif %}
+{% if state.notices.shop_online %}<div class="alert alert-warning">The ticket shop is still online.</div>{% endif %}
+{% if state.deferral_reason %}<div class="alert alert-info">Review resumes {{ state.deferred_until|date:"SHORT_DATETIME_FORMAT" }}. {{ state.deferral_reason }}</div>{% endif %}
+<div class="row">
+    <div class="col-md-7">
+        <h2>Audit findings</h2>
+        <table class="table table-striped">
+            <thead><tr><th scope="col">Finding</th><th scope="col">Count</th><th scope="col">Assessment</th></tr></thead>
+            <tbody>
+                {% for issue, count, assessment in findings %}<tr><td>{{ issue }}</td><td>{{ count }}</td><td>{{ assessment }}</td></tr>{% empty %}<tr><td colspan="3">No findings recorded.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+        <form method="post" class="form-inline">
+            {% csrf_token %}
+            <button class="btn btn-default" type="submit" name="action" value="preview">Preview notification</button>
+            <button class="btn btn-primary" type="submit" name="action" value="send"{% if excluded or not enabled %} disabled{% endif %}>Send reminder</button>
+        </form>
+        {% if preview %}<div class="panel panel-default" style="margin-top:15px"><div class="panel-heading">Email preview</div><div class="panel-body">{{ preview.preview_html }}</div></div>{% endif %}
+    </div>
+    <div class="col-md-5">
+        <h2>Defer review</h2>
+        <form method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <p class="help-block">Record the retention reason without including participant details.</p>
+            <button class="btn btn-default" type="submit" name="action" value="defer">Defer review</button>
+            {% if state.deferred_until %}<button class="btn btn-default" type="submit" name="action" value="resume" formnovalidate>Resume monitoring</button>{% endif %}
+        </form>
+    </div>
+</div>
+<form method="post" class="pull-right">
+    {% csrf_token %}
+    <button class="btn btn-default" type="submit" name="action" value="refresh_delivery">Refresh delivery status</button>
+</form>
+<h2>Reminder history</h2>
+<div class="table-responsive">
+<table class="table table-striped">
+    <thead><tr><th scope="col">Occurrence</th><th scope="col">Status</th><th scope="col">Recipient source</th><th scope="col">Queued</th><th scope="col">Handed off</th><th scope="col">Error</th></tr></thead>
+    <tbody>{% for item in history %}
+        <tr><td>{{ item.occurrence }}</td><td>{{ item.get_state_display }}</td><td>{{ item.recipient_source|default:"—" }}</td><td>{{ item.queued_at|date:"SHORT_DATETIME_FORMAT"|default:"—" }}</td><td>{{ item.sent_at|date:"SHORT_DATETIME_FORMAT"|default:"—" }}</td><td>{{ item.error_code|default:"—" }}</td></tr>
+    {% empty %}<tr><td colspan="6">No reminder history.</td></tr>{% endfor %}</tbody>
+</table>
+</div>
+{% include "pretix_dataprotection_monitor/pagination.html" with page=history %}
+{% endblock %}

@@ -1,0 +1,1 @@
+<span class="label {% if status == 'action_required' or status == 'scan_error' %}label-danger{% elif status == 'manual_review' %}label-warning{% elif status == 'no_known_identifiers' %}label-success{% elif status == 'deferred' %}label-info{% else %}label-default{% endif %}">{{ label }}</span>

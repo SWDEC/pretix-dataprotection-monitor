@@ -1,0 +1,14 @@
+# syntax=docker/dockerfile:1
+FROM pretix/standalone:2026.9.1
+USER root
+WORKDIR /opt/pretix-dataprotection-monitor
+COPY pyproject.toml requirements-test.txt ./
+COPY pretix_dataprotection_monitor/ pretix_dataprotection_monitor/
+COPY tests/ tests/
+RUN python -m pip install --no-cache-dir -r requirements-test.txt \
+ && python -m pip install --no-cache-dir --no-deps . \
+ && python -m pip check
+USER pretixuser
+ENV DJANGO_SETTINGS_MODULE=tests.settings
+ENTRYPOINT ["python"]
+CMD ["-m", "pytest", "-q"]

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pretix-dataprotection-monitor"
+version = "0.4.0"
+description = "Read-only data protection auditing for pretix"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+dependencies = ["pretix==2026.9.1"]
+
+[project.entry-points."pretix.plugin"]
+pretix_dataprotection_monitor = "pretix_dataprotection_monitor:PretixPluginMeta"
+
+[tool.setuptools.packages.find]
+include = ["pretix_dataprotection_monitor*"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+
+[tool.setuptools.package-data]
+pretix_dataprotection_monitor = ["templates/pretix_dataprotection_monitor/*.txt", "templates/pretix_dataprotection_monitor/*.html"]

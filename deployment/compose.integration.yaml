@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: monitor_fixture
+      POSTGRES_PASSWORD: monitor_fixture
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "monitor_fixture", "-d", "postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  redis:
+    image: redis:6-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  integration:
+    platform: linux/amd64
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile.integration
+    environment:
+      MONITOR_TEST_POSTGRES_HOST: postgres
+      MONITOR_TEST_POSTGRES_PORT: "5432"
+      MONITOR_TEST_POSTGRES_USER: monitor_fixture
+      MONITOR_TEST_POSTGRES_PASSWORD: monitor_fixture
+      MONITOR_SMOKE_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy

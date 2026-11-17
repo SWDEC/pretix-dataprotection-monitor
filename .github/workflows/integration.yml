@@ -1,0 +1,25 @@
+name: pretix integration
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build isolated pretix test image
+        run: docker compose -f deployment/compose.integration.yaml build
+      - name: Run regression tests on PostgreSQL
+        run: docker compose -f deployment/compose.integration.yaml run --rm integration -m pytest -q
+      - name: Run a dry audit through pretix cron, Redis and Celery
+        run: docker compose -f deployment/compose.integration.yaml run --rm integration -m tests.worker_smoke
+      - name: Remove test services and their data
+        if: always()
+        run: docker compose -f deployment/compose.integration.yaml down --volumes

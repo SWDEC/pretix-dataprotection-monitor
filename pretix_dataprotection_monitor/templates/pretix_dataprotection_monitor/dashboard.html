@@ -1,0 +1,73 @@
+{% extends "pretixcontrol/base.html" %}
+{% load i18n %}
+{% block title %}Data Protection Monitor{% endblock %}
+{% block content %}
+<div class="clearfix">
+    <div class="pull-right">
+        <a class="btn btn-default" href="{% url 'plugins:pretix_dataprotection_monitor:settings' %}"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a>
+        <form action="{% url 'plugins:pretix_dataprotection_monitor:run' %}" method="post" style="display:inline">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit"><i class="fa fa-refresh" aria-hidden="true"></i> Run audit now</button>
+        </form>
+    </div>
+    <h1>Data Protection Monitor</h1>
+</div>
+{% if config.enabled %}
+<p><span class="label label-success">Live reminders enabled</span></p>
+{% else %}
+<p><span class="label label-info">Dry run</span> Live reminders are disabled.</p>
+{% endif %}
+{% if latest.active_slot %}
+<div class="alert alert-info" role="status">Audit {{ latest.get_state_display|lower }}. {{ latest.events_checked }} events checked so far.</div>
+{% elif latest.error_code %}
+<div class="alert alert-warning" role="status">Last run failed: {{ latest.error_code }}.</div>
+{% elif latest.scan_errors %}
+<div class="alert alert-warning" role="status">The last run completed with {{ latest.scan_errors }} scan errors.</div>
+{% endif %}
+<div class="row">
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>Organizers checked</strong><h2>{{ latest.organizers_checked|default:"0" }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>Events checked</strong><h2>{{ checked }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>No known identifiers</strong><h2>{{ clean }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>Action required</strong><h2>{{ action }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>Manual review</strong><h2>{{ manual }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>Errors requiring attention</strong><h2>{{ scan_errors|add:mail_errors }}</h2></div></div></div>
+</div>
+<p><strong>Last successful audit</strong> {{ successful.finished_at|date:"SHORT_DATETIME_FORMAT"|default:"—" }} &nbsp; <strong>Last reminder handoff</strong> {{ last_mail|date:"SHORT_DATETIME_FORMAT"|default:"—" }}</p>
+{% if scan_errors or mail_errors %}
+<p>{{ scan_errors }} scan errors and {{ mail_errors }} reminders requiring attention. Open an event to see its status and history.</p>
+{% endif %}
+<h2>Events</h2>
+<form method="get" class="form-inline" style="margin-bottom:15px">
+    <div class="form-group">
+        <label for="monitor-q">Organizer or event</label>
+        <input id="monitor-q" type="search" class="form-control" name="q" value="{{ query }}">
+    </div>
+    <div class="form-group">
+        <label for="monitor-status">Status</label>
+        <select id="monitor-status" name="status" class="form-control">
+            <option value="">All statuses</option>
+            {% for value, label in status_choices %}<option value="{{ value }}"{% if selected == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-default">Filter</button>
+</form>
+<div class="table-responsive">
+<table class="table table-striped">
+    <thead><tr><th scope="col">Organizer</th><th scope="col">Event</th><th scope="col">End date</th><th scope="col">Audit status</th><th scope="col">Last reminder</th></tr></thead>
+    <tbody>
+    {% for state in page %}
+    <tr>
+        <td>{{ state.event.organizer.name }} <small class="text-muted">#{{ state.event.organizer_id }}</small></td>
+        <td><a href="{% url 'plugins:pretix_dataprotection_monitor:event' event_id=state.event_id %}">{{ state.event.name }}</a> <small class="text-muted">#{{ state.event_id }}</small></td>
+        <td>{{ state.event_end|date:"j M Y"|default:"—" }}</td>
+        <td>{% include "pretix_dataprotection_monitor/status.html" with status=state.display_status label=state.status_label only %}</td>
+        <td>{{ state.last_reminder|date:"j M Y"|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No events match this view.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% include "pretix_dataprotection_monitor/pagination.html" with page=page %}
+{% endblock %}
