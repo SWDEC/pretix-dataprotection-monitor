@@ -7,11 +7,11 @@ class DataProtectionMonitorApp(PluginConfig):
     class PretixPluginMeta:
         name = "Data Protection Monitor"
         author = "SWD-EC"
-        version = "0.5.1"
+        version = "0.5.2"
         description = "Installation-wide read-only audit of completed events."
         category = "FEATURE"
         visible = False
-        compatibility = "pretix==2026.9.1"
+        compatibility = "pretix>=2026.9.1,<=2026.9.2"
 
     def ready(self):
         from . import runs, scheduler, signals  # noqa: F401

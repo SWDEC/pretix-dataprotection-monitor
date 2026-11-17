@@ -38,7 +38,7 @@ def order(event):
 
 def test_runtime():
     expected = {
-        "pretix": "2026.9.1", "Django": "5.2.19", "celery": "5.6.3",
+        "pretix": "2026.9.2", "Django": "5.2.19", "celery": "5.6.3",
         "pretix-passbook": "1.14.1", "pretix-attendance-certificate-neo": "1.0.1",
         "pretix-fontpack-free": "1.11.2", "pretix-sofort": "1.4.2",
     }

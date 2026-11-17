@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
-FROM pretix/standalone:2026.9.1
+FROM pretix/standalone:2026.9.2
 USER root
 WORKDIR /opt/pretix-dataprotection-monitor
-COPY pyproject.toml requirements-test.txt ./
+COPY pyproject.toml LICENSE requirements-test.txt ./
 COPY pretix_dataprotection_monitor/ pretix_dataprotection_monitor/
 COPY tests/ tests/
 RUN python -m pip install --no-cache-dir -r requirements-test.txt \

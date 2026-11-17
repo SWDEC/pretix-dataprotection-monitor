@@ -1,13 +1,13 @@
 # pretix Data Protection Monitor
 
 The monitor implements a read-only audit and a notification service for
-pretix 2026.9.1. The audit returns event IDs, timestamps, issue categories
+pretix 2026.9.1 and 2026.9.2. The audit returns event IDs, timestamps, issue categories
 and counts. Notifications are disabled by default. The administrative UI supports manual audits, and pretix’s periodic
 scheduler discovers and rechecks events automatically.
 
 ## Run an audit
 
-Install the package into a pretix 2026.9.1 environment. Plugin discovery uses
+Install the package into a pretix 2026.9.1 or 2026.9.2 environment. Plugin discovery uses
 the `pretix.plugin` entry point and does not require enabling the plugin on
 each event. These commands emit one aggregate JSON object per event.
 

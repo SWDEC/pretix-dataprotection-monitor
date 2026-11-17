@@ -2,7 +2,7 @@
 
 ## Isolated integration environment
 
-The Compose project uses the official pretix 2026.9.1 image, PostgreSQL 14
+The Compose project uses the official pretix 2026.9.2 image, PostgreSQL 14
 and Redis 6. It publishes no ports and mounts no deployment data. Its
 credentials are fixtures used only on the private Compose network. The test
 settings use Django's in-memory mail backend.
@@ -31,7 +31,7 @@ pushed. The amd64 test image may require emulation on ARM hosts.
 
 ## Add the plugin to the existing pretix image
 
-The deployment target is pretix 2026.9.1, Python 3.13.18, Django 5.2.19,
+The deployment target is pretix 2026.9.2, Python 3.13.18, Django 5.2.19,
 Celery 5.6.3 and the four pinned extensions in
 `requirements-test.txt`. Keep the existing custom image and its
 configuration. Install the monitor from its public Git release tag.
@@ -39,11 +39,12 @@ configuration. Install the monitor from its public Git release tag.
 Add the install step after installing Git, pretix and the other extensions.
 If the existing build switches to the runtime user, install before that
 switch and restore the existing runtime user afterward. Adjust the
-repository URL if you publish under a different owner.
+repository URL if you publish under a different owner. Pin the base image
+to `FROM pretix/standalone:2026.9.2` so the build uses the tested release.
 
 ```dockerfile
 RUN env -u DJANGO_SETTINGS_MODULE python -m pip install --no-cache-dir --no-deps \
-    "pretix-dataprotection-monitor @ git+https://github.com/SWDEC/pretix-dataprotection-monitor.git@v0.5.1" \
+    "pretix-dataprotection-monitor @ git+https://github.com/SWDEC/pretix-dataprotection-monitor.git@v0.5.2" \
     && python -m pip check
 ```
 
