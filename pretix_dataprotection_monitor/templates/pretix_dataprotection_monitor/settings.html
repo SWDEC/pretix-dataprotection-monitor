@@ -1,27 +1,35 @@
 {% extends "pretixcontrol/base.html" %}
+{% load i18n %}
 {% load bootstrap3 %}
-{% block title %}Data protection settings{% endblock %}
+{% block title %}{% translate "Data protection settings" %}{% endblock %}
 {% block content %}
-<p><a href="{% url 'plugins:pretix_dataprotection_monitor:dashboard' %}">Data Protection Monitor</a></p>
-<h1>Data protection settings</h1>
-<p>Use the organizer and event IDs shown in the dashboard to configure exclusions.</p>
+<p><a href="{% url 'plugins:pretix_dataprotection_monitor:dashboard' %}">{% translate "Data Protection Monitor" %}</a></p>
+<h1>{% translate "Data protection settings" %}</h1>
+<p>{% translate "Use the organizer and event IDs shown in the dashboard to configure exclusions." %}</p>
 {% if approved_run %}
-<p>Successful dry run available for review from {{ approved_run.finished_at|date:"SHORT_DATETIME_FORMAT" }}.</p>
+<p>{% blocktranslate with finished=approved_run.finished_at|date:"SHORT_DATETIME_FORMAT" %}Successful dry run available for review from {{ finished }}.{% endblocktranslate %}</p>
 {% else %}
-<p>Complete a dry-run audit before approving live reminders.</p>
+<p>{% translate "Complete a dry-run audit before approving live reminders." %}</p>
 {% endif %}
 <form method="post" class="form-horizontal">
     {% csrf_token %}
     {% bootstrap_form_errors form %}
-    {% bootstrap_form form layout='control' %}
-    <p>Available placeholders: {% for placeholder in placeholders %}<code>{% templatetag openbrace %}{{ placeholder }}{% templatetag closebrace %}</code>{% if not forloop.last %}, {% endif %}{% endfor %}. Double braces for literal braces.</p>
+    {% for field in form %}
+        {% bootstrap_field field layout='control' %}
+        {% if field.name == 'body' %}
+            <div class="well well-sm">
+                <p>{% translate "Available placeholders:" %} {% for placeholder in placeholders %}<code>{% templatetag openbrace %}{{ placeholder }}{% templatetag closebrace %}</code>{% if not forloop.last %}, {% endif %}{% endfor %}. {% translate "Double braces for literal braces." %}</p>
+                <p>{% translate "Paste an HTTP or HTTPS URL, or use the following syntax for a named link." %} <code>[Guide](https://example.org/guide)</code></p>
+                <button type="submit" class="btn btn-default" name="action" value="preview" formnovalidate>{% translate "Preview email" %}</button>
+                <button type="submit" class="btn btn-default" name="action" value="test" formnovalidate>{% translate "Send test email" %}</button>
+            </div>
+            {% if preview %}
+                <div class="panel panel-default"><div class="panel-heading">{% translate "Email preview · sample data" %}</div><div class="panel-body">{{ preview.preview_html }}</div></div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
     <div class="form-group submit-group">
-        <button type="submit" class="btn btn-primary" name="action" value="save">Save settings</button>
-        <button type="submit" class="btn btn-default" name="action" value="preview" formnovalidate>Preview email</button>
-        <button type="submit" class="btn btn-default" name="action" value="test" formnovalidate>Send test email</button>
+        <button type="submit" class="btn btn-primary" name="action" value="save">{% translate "Save settings" %}</button>
     </div>
 </form>
-{% if preview %}
-    <div class="panel panel-default"><div class="panel-heading">Email preview · sample data</div><div class="panel-body">{{ preview.preview_html }}</div></div>
-{% endif %}
 {% endblock %}

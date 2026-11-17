@@ -1,0 +1,38 @@
+.dp-monitor-score {
+    display: inline-block;
+    padding: .3em .65em;
+    border-radius: .25em;
+    font-weight: 600;
+}
+
+.dp-monitor-score-good {
+    background: #d9f2e1;
+    color: #14532d;
+}
+
+.dp-monitor-score-fair {
+    background: #ffedd5;
+    color: #813400;
+}
+
+.dp-monitor-score-poor,
+.dp-monitor-attention {
+    background: #fee2e2;
+    color: #8d2020;
+}
+
+.dp-monitor-attention {
+    border-radius: .25em;
+    padding: .18em .35em;
+    font-weight: 600;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .dp-monitor-attention {
+        animation: dp-monitor-pulse 1.2s ease-in-out 3;
+    }
+}
+
+@keyframes dp-monitor-pulse {
+    50% { background-color: #ffafaf; }
+}

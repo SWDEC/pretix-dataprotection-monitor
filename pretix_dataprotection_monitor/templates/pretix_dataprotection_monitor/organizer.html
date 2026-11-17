@@ -1,0 +1,65 @@
+{% extends "pretixcontrol/base.html" %}
+{% load i18n static %}
+{% block title %}{% translate "Data Protection Monitor" %}{% endblock %}
+{% block custom_header %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'pretix_dataprotection_monitor/score.css' %}">
+{% endblock %}
+{% block content %}
+<h1>{% translate "Data Protection Monitor" %}</h1>
+<section class="panel panel-default">
+    <div class="panel-body">
+        <h2>{% translate "Audit score" %}</h2>
+        {% if excluded %}
+            <p>{% translate "This organizer is excluded from the monitor." %}</p>
+        {% elif scored %}
+            <p class="lead"><span class="dp-monitor-score dp-monitor-score-{{ rating }}">
+                {{ score }} / 10
+                {% if rating == "good" %}· {% translate "Good" %}
+                {% elif rating == "fair" %}· {% translate "Needs attention" %}
+                {% elif rating == "poor" %}· {% translate "Priority review" %}
+                {% endif %}
+            </span></p>
+            <p>{% blocktranslate %}Based on {{ scored }} audited events you can access.{% endblocktranslate %}</p>
+            <p>{% translate "A clean audit earns 10 points, manual review 5, and action required 0. The score is the rounded average and only reflects supported audit checks." %}</p>
+            <p>{% translate "Events that are deferred, not due, unaudited, excluded, or have scan errors are omitted from the score." %}</p>
+        {% else %}
+            <p>{% translate "A score will appear once an eligible event you can access has been audited." %}</p>
+        {% endif %}
+    </div>
+</section>
+{% if action_count or manual_count or error_count %}
+<h2>{% translate "What to review" %}</h2>
+<ul>
+    {% if action_count %}<li>{% translate "Check whether the remaining customer or attendee data is still needed. Use pretix’s deletion tools when retention obligations allow it." %}</li>{% endif %}
+    {% if manual_count %}<li>{% translate "Review uncertain findings and document any reason to retain data, particularly financial records." %}</li>{% endif %}
+    {% if error_count %}<li>{% translate "Ask your pretix administrator to investigate events with scan errors." %}</li>{% endif %}
+</ul>
+<div class="table-responsive">
+<table class="table table-striped">
+    <thead><tr><th scope="col">{% translate "Event" %}</th><th scope="col">{% translate "Audit status" %}</th><th scope="col">{% translate "Next step" %}</th></tr></thead>
+    <tbody>
+    {% for state in page %}
+    <tr>
+        <td>{{ state.event.name }}</td>
+        <td>{% include "pretix_dataprotection_monitor/status.html" with status=state.display_status label=state.status_label only %}</td>
+        <td>
+            {% if state.display_status == "scan_error" %}
+                {% translate "Contact your pretix administrator." %}
+            {% else %}
+                {% if state.event.live %}<p>{% translate "Take the ticket shop offline if the event is finished and you need to use the deletion tools." %}</p>{% endif %}
+                {% if state.control_url %}
+                    <a href="{{ state.control_url }}">{% translate "Open pretix’s personal-data deletion page" %}</a>
+                {% else %}
+                    {% translate "Ask an event administrator to review this event." %}
+                {% endif %}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% include "pretix_dataprotection_monitor/pagination.html" with page=page %}
+{% endif %}
+{% endblock %}

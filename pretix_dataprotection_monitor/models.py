@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
 from django.db.models import Q
@@ -43,7 +44,7 @@ class NotificationSettings(models.Model):
         validate_template(self.body)
         if self.enabled and (not self.administrator_email or not self.initial_review_at):
             raise ValidationError(
-                "Sending requires a fallback address and acknowledgment of the initial audit."
+                _("Sending requires a fallback address and acknowledgment of the initial audit.")
             )
 
     def save(self, *args, **kwargs):

@@ -2,6 +2,7 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import validate_email
 from django.urls import reverse
 from pretix.base.services.mail import INVALID_ADDRESS, mail
@@ -86,5 +87,5 @@ def queue_message(address, message, *, kind):
 def send_test_email(config):
     address = valid_address(config.administrator_email)
     if address is None:
-        raise ValidationError("Enter a valid administrator fallback email before sending a test.")
+        raise ValidationError(_("Enter a valid administrator fallback email before sending a test."))
     return queue_message(address, preview_email(config), kind="test")

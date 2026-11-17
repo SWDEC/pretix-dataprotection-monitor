@@ -1,14 +1,20 @@
 from django.db import transaction
 from django.dispatch import receiver
+from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.html import format_html
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from pretix.base.models import OutgoingMail
 from pretix.base.services.mail import WithholdMailException
 from pretix.base.signals import global_email_filter, periodic_task
-from pretix.control.signals import nav_global
+from pretix.control.signals import nav_global, nav_organizer
 
 from .mailing import MONITOR_HEADER, valid_address
 from .models import DeliveryAttempt, EventAuditState, NotificationSettings, Reminder
+from .organizer import organizer_summary
+from .templates_mail import linked_html
+from .labels import ORGANIZER_PERMISSION
 
 DELIVERY_UNCONFIRMED = "dp_monitor_delivery_unconfirmed"
 DELIVERY_DISABLED = "dp_monitor_delivery_disabled"
@@ -59,15 +65,15 @@ def _claim_mail(mail_id):
 
 @receiver(global_email_filter, dispatch_uid="pretix_dataprotection_monitor.send_guard")
 def guard_reminder_delivery(sender, *, message, outgoing_mail=None, **kwargs):
-    if (
-        outgoing_mail is not None
-        and outgoing_mail.headers.get(MONITOR_HEADER) == "reminder"
-        and outgoing_mail.event_id is None
-        and outgoing_mail.organizer_id is None
-    ):
+    if outgoing_mail is None or outgoing_mail.event_id is not None or outgoing_mail.organizer_id is not None:
+        return message
+    kind = outgoing_mail.headers.get(MONITOR_HEADER)
+    if kind == "reminder":
         code = _claim_mail(outgoing_mail.pk)
         if code:
             raise WithholdMailException(code, "Administrative review required.")
+    if kind in {"reminder", "test"}:
+        message.attach_alternative(linked_html(message.body), "text/html")
     return message
 
 
@@ -76,7 +82,7 @@ def navigation(sender, request, **kwargs):
     if not request.user.has_active_staff_session(request.session.session_key):
         return []
     return [{
-        "label": "Data Protection Monitor",
+        "label": _("Data Protection Monitor"),
         "url": reverse("plugins:pretix_dataprotection_monitor:dashboard"),
         "icon": "shield",
         "parent": reverse("control:global.settings"),
@@ -89,3 +95,23 @@ def schedule_monitor(sender, **kwargs):
     from .scheduler import periodic_tick
 
     periodic_tick()
+
+
+@receiver(nav_organizer, dispatch_uid="pretix_dataprotection_monitor.organizer_navigation")
+def organizer_navigation(sender, request, organizer, **kwargs):
+    if ORGANIZER_PERMISSION not in request.orgapermset:
+        return []
+    rating = organizer_summary(request).rating
+    label = _("Data Protection Monitor")
+    if rating == "poor":
+        label = format_html(
+            '<link rel="stylesheet" href="{}"><span class="dp-monitor-attention">{}</span>'
+            '<span class="sr-only"> · {}</span>',
+            static("pretix_dataprotection_monitor/score.css"), label, _("Priority review"),
+        )
+    return [{
+        "label": label,
+        "url": reverse("plugins:pretix_dataprotection_monitor:organizer", kwargs={"organizer": organizer.slug}),
+        "icon": "shield",
+        "active": request.resolver_match.view_name == "plugins:pretix_dataprotection_monitor:organizer",
+    }]

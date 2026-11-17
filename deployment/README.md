@@ -34,23 +34,24 @@ pushed. The amd64 test image may require emulation on ARM hosts.
 The deployment target is pretix 2026.9.1, Python 3.13.18, Django 5.2.19,
 Celery 5.6.3 and the four pinned extensions in
 `requirements-test.txt`. Keep the existing custom image and its
-configuration. Extend its build context with the release wheel.
+configuration. Install the monitor from its public Git release tag.
 
-Add an install step to the custom Dockerfile after installing pretix and
-its other extensions. If the existing build switches to the runtime user,
-install before that switch and restore the existing runtime user afterward.
+Add the install step after installing Git, pretix and the other extensions.
+If the existing build switches to the runtime user, install before that
+switch and restore the existing runtime user afterward. Adjust the
+repository URL if you publish under a different owner.
 
 ```dockerfile
-COPY pretix_dataprotection_monitor-0.4.0-py3-none-any.whl /tmp/pretix_dataprotection_monitor-0.4.0-py3-none-any.whl
-RUN python -m pip install --no-cache-dir --no-deps /tmp/pretix_dataprotection_monitor-0.4.0-py3-none-any.whl \
+RUN env -u DJANGO_SETTINGS_MODULE python -m pip install --no-cache-dir --no-deps \
+    "pretix-dataprotection-monitor @ git+https://github.com/SWDEC/pretix-dataprotection-monitor.git@v0.5.1" \
     && python -m pip check
 ```
 
 Use the same rebuilt image for the web process, Celery worker and the
 container executing pretix's periodic command. The current deployment runs
 Gunicorn and Celery under Supervisor in `pretix-pretix-1`. Keep the
-deployment's existing service and image layout. This plugin uses pretix's
-existing assets and does not ship separate JavaScript or CSS.
+deployment's existing service and image layout. Keep the existing `make production` image build step so pretix collects
+the monitor stylesheet along with the other static assets.
 
 ## Staging and deployment checklist
 

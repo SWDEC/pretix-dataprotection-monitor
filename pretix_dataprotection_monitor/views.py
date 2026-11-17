@@ -9,6 +9,7 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy
 from django.views import View
 from django_scopes import scopes_disabled
 from pretix.base.models import Event
@@ -16,6 +17,7 @@ from pretix.control.permissions import AdministratorPermissionRequiredMixin
 
 from .audit import Status, audit_event
 from .forms import DeferralForm, MonitorSettingsForm
+from .labels import DELIVERY_LABELS, ISSUE_LABELS, RUN_LABELS, STATUS_LABELS
 from .mailing import preview_email, send_test_email
 from .models import AuditRun, EventAuditState, NotificationSettings, Reminder
 from .notifications import pending_reminder_ids, reconcile_reminder, request_reminder
@@ -24,15 +26,7 @@ from .templates_mail import PLACEHOLDERS
 
 NAMESPACE = "plugins:pretix_dataprotection_monitor:"
 TEMPLATES = "pretix_dataprotection_monitor/"
-STATUS_LABELS = {
-    "": "Awaiting audit",
-    Status.NOT_DUE: "Not due",
-    Status.NO_KNOWN_IDENTIFIERS: "No known identifiers",
-    Status.ACTION_REQUIRED: "Action required",
-    Status.MANUAL_REVIEW: "Manual review",
-    Status.DEFERRED: "Deferred",
-    Status.SCAN_ERROR: "Scan error",
-}
+
 
 
 def _config():
@@ -96,7 +90,8 @@ class Dashboard(AdminView):
         latest = AuditRun.objects.order_by("-created_at").first()
         return self.show(
             request, "dashboard.html", config=config, page=page, latest=latest,
-            successful=_successful_runs(config).first(), selected=selected, query=query,
+            successful=_successful_runs(config).first(), run_status=RUN_LABELS.get(latest.state) if latest else None,
+            selected=selected, query=query,
             status_choices=[(key, label) for key, label in STATUS_LABELS.items() if key],
             checked=sum(counts.values()) - counts[""], clean=counts[Status.NO_KNOWN_IDENTIFIERS],
             action=counts[Status.ACTION_REQUIRED], manual=counts[Status.MANUAL_REVIEW],
@@ -113,7 +108,7 @@ class Dashboard(AdminView):
 class RunAudit(AdminView):
     def post(self, request):
         _, created = enqueue_audit()
-        messages.info(request, "Audit queued. Refresh this page to see progress." if created else "An audit is already active.")
+        messages.info(request, gettext_lazy("Audit queued. Refresh this page to see progress.") if created else gettext_lazy("An audit is already active."))
         return redirect(NAMESPACE + "dashboard")
 
 
@@ -131,7 +126,7 @@ class SettingsView(AdminView):
     def post(self, request):
         action = request.POST.get("action")
         if action not in {"save", "preview", "test"}:
-            return HttpResponseBadRequest("Unknown settings action.")
+            return HttpResponseBadRequest(gettext_lazy("Unknown settings action."))
         if action != "save":
             config = _config()
             # Preview and test use the submitted draft subject, body and fallback only.
@@ -144,7 +139,7 @@ class SettingsView(AdminView):
                 preview = preview_email(draft)
                 if action == "test":
                     send_test_email(draft)
-                    messages.success(request, "Synthetic test email submitted to the mail service.")
+                    messages.success(request, gettext_lazy("Synthetic test email submitted to the mail service."))
             except ValidationError as error:
                 form.add_error(None, error)
                 preview = None
@@ -157,7 +152,7 @@ class SettingsView(AdminView):
             )
             if form.is_valid():
                 form.save()
-                messages.success(request, "Settings saved.")
+                messages.success(request, gettext_lazy("Settings saved."))
                 return redirect(NAMESPACE + "settings")
         return self._show(request, form, config)
 
@@ -167,18 +162,24 @@ class EventDetail(AdminView):
         state = EventAuditState.objects.filter(event=event).first()
         route = "control:event.shredder.start"
         findings = [
-            (key.replace("_", " ").capitalize(), count, assessment)
+            (ISSUE_LABELS.get(key, key.replace("_", " ").capitalize()), count, assessment)
             for categories, assessment in (
-                (state.identifiers if state else {}, "Identifier found"),
-                (state.review if state else {}, "Manual review"),
+                (state.identifiers if state else {}, gettext_lazy("Identifier found")),
+                (state.review if state else {}, gettext_lazy("Manual review")),
             )
             for key, count in sorted(categories.items())
         ]
+        history = Paginator(Reminder.objects.filter(event=event).order_by("-occurrence"), 20).get_page(
+            request.GET.get("page")
+        )
+        for reminder in history:
+            reminder.status_label = DELIVERY_LABELS.get(reminder.state, reminder.state)
+            reminder.recipient_label = {"contact": gettext_lazy("Event contact"), "fallback": gettext_lazy("Administrator fallback")}.get(
+                reminder.recipient_source, "",
+            )
         return self.show(
             request, "event.html", event=event, state=state, status_label=_display_status(state),
-            history=Paginator(Reminder.objects.filter(event=event).order_by("-occurrence"), 20).get_page(
-                request.GET.get("page")
-            ),
+            history=history,
             shredder_url=reverse(route, kwargs={"organizer": event.organizer.slug, "event": event.slug}),
             form=form if form is not None else DeferralForm(event=event),
             excluded=_excluded(event, config), preview=preview, findings=findings, enabled=config.enabled,
@@ -198,15 +199,15 @@ class EventDetail(AdminView):
         if action == "send":
             result = request_reminder(event_id)
             message = {
-                "queued": "Reminder submitted to the mail service.",
-                "disabled": "Live reminders are disabled.",
-                "ineligible": "This event is currently ineligible for a reminder.",
-                "test_data": "This event contains test data and requires review.",
-                "pending": "A reminder is already in progress.",
-                "cooldown": "This event is still within the reminder interval.",
-                "throttled": "The hourly reminder limit has been reached.",
-                "blocked": "The reminder requires administrative attention.",
-                "invalid_configuration": "Review the notification settings before sending.",
+                "queued": gettext_lazy("Reminder submitted to the mail service."),
+                "disabled": gettext_lazy("Live reminders are disabled."),
+                "ineligible": gettext_lazy("This event is currently ineligible for a reminder."),
+                "test_data": gettext_lazy("This event contains test data and requires review."),
+                "pending": gettext_lazy("A reminder is already in progress."),
+                "cooldown": gettext_lazy("This event is still within the reminder interval."),
+                "throttled": gettext_lazy("The hourly reminder limit has been reached."),
+                "blocked": gettext_lazy("The reminder requires administrative attention."),
+                "invalid_configuration": gettext_lazy("Review the notification settings before sending."),
             }[result.outcome]
             messages.info(request, message)
         elif action == "refresh_delivery":
@@ -215,7 +216,7 @@ class EventDetail(AdminView):
             )
             for reminder_id in ids:
                 reconcile_reminder(reminder_id)
-            messages.info(request, "Reminder delivery status refreshed.")
+            messages.info(request, gettext_lazy("Reminder delivery status refreshed."))
         elif action in {"defer", "resume"}:
             form = DeferralForm(request.POST, event=event)
             if action == "defer" and not form.is_valid():
@@ -225,7 +226,7 @@ class EventDetail(AdminView):
                 state.deferred_until = form.cleaned_data["resume_on"] if action == "defer" else None
                 state.deferral_reason = form.cleaned_data["reason"] if action == "defer" else ""
                 state.save(update_fields=["deferred_until", "deferral_reason"])
-            messages.success(request, "Review deferred." if action == "defer" else "Monitoring resumed.")
+            messages.success(request, gettext_lazy("Review deferred.") if action == "defer" else gettext_lazy("Monitoring resumed."))
         else:
-            return HttpResponseBadRequest("Unknown event action.")
+            return HttpResponseBadRequest(gettext_lazy("Unknown event action."))
         return redirect(NAMESPACE + "event", event_id=event_id)

@@ -303,3 +303,18 @@ def test_ambiguous_transport_error_does_not_reach_smtp_twice(event, order, confi
         result = request_reminder(event.pk)
     assert send.call_count == 1
     assert reconcile_reminder(result.reminder_id).error_code == "dp_monitor_delivery_unconfirmed"
+
+
+def test_test_email_has_safe_clickable_html_and_plain_text():
+    body = ('Open [the guide](https://example.org/guide?a=1&b=2), or visit '
+            'https://example.org/help. <script>example</script> [unsafe](javascript:alert(1))')
+    config = NotificationSettings(administrator_email=FALLBACK, body=body)
+    send_test_email(config)
+    message = mail.outbox[0]
+    assert body in message.body
+    rendered, mimetype = message.alternatives[0]
+    assert mimetype == "text/html"
+    assert '<a href="https://example.org/guide?a=1&amp;b=2">the guide</a>' in rendered
+    assert '<a href="https://example.org/help">https://example.org/help</a>.' in rendered
+    assert "&lt;script&gt;example&lt;/script&gt;" in rendered
+    assert '<a href="javascript:' not in rendered

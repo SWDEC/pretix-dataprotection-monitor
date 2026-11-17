@@ -96,8 +96,10 @@ enabling live reminders through the settings page.
 
 Templates accept `{event_name}`, `{organizer_name}`, `{event_end}`,
 `{days_since_event}`, `{issues_summary}`, `{event_url}` and `{due_date}`.
-Double braces render literal braces. Substitution runs once. Mail uses plain
-text. It goes through the global pretix mail configuration with no order
+Double braces render literal braces. Substitution runs once. Email includes a plain-text version and an HTML
+version with clickable links. Paste a full HTTP(S) URL or use
+`[Link text](https://example.org/guide)`. HTML entered into the template
+is displayed as text. It goes through the global pretix mail configuration with no order
 association or automatic event BCC. The reminder recipient is the effective
 event contact, with a validated administrator fallback.
 
@@ -141,6 +143,21 @@ the audit scope require a fresh successful run and acknowledgment before
 re-enabling live reminders. Audit frequency controls automatic full audits. The native periodic trigger
 also dispatches bounded reminder and delivery-status checks. Existing pending mail is checked against current
 delivery settings and deferrals before a worker hands it off.
+
+The administration interface follows pretix’s active language. English and
+German are included. Localizations for other languages can be added under
+`pretix_dataprotection_monitor/locale/`. Rebuild a catalog after editing it
+with `msgfmt -o django.mo django.po` from its `LC_MESSAGES` directory.
+
+The organizer sidebar has a read-only **Data Protection Monitor** view for
+users with organizer settings permission. The rating only uses events for
+which the user has order access. It averages 10 for no known identifiers,
+5 for manual review and 0 for action required, rounded to a whole number.
+Deferred, not-due, excluded, unaudited events and scan errors do not count.
+The score reflects supported audit checks. Scores of 8–10 are green, 5–7
+are orange, and 0–4 are red. A low score briefly pulses the organizer’s
+sidebar item when the browser allows motion. Users need order-write
+permission on a flagged event to see its pretix deletion-page link.
 
 ## Regression tests
 

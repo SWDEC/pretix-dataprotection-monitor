@@ -1,9 +1,11 @@
 import re
 from dataclasses import dataclass
 from string import Formatter
+from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
-from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
+from django.utils.html import escape, format_html, format_html_join
 
 DEFAULT_SUBJECT = "Data protection review required — {event_name}"
 DEFAULT_BODY = """Hello,
@@ -39,19 +41,19 @@ FIELD_PATTERN = re.compile(r"\{\{ | \}\} | \{([a-z_]+)\}", re.X)
 def validate_template(value, *, subject=False):
     limit = 300 if subject else 12000
     if not value.strip() or len(value) > limit:
-        raise ValidationError(f"Enter a template of 1 to {limit} characters.")
+        raise ValidationError(_("Enter a template of 1 to %(limit)s characters.") % {"limit": limit})
     if "\x00" in value or (subject and len(value.splitlines()) > 1) or (
         subject and any(char in value for char in "\r\n")
     ):
-        raise ValidationError("This template contains unsupported control characters.")
+        raise ValidationError(_("This template contains unsupported control characters."))
     # Reject even an empty format specifier, including constructions such as
     # {event_name:}. Only exact fields and doubled literal braces are valid.
     remainder = FIELD_PATTERN.sub("", value)
     if "{" in remainder or "}" in remainder:
-        raise ValidationError("Use exact placeholder names or double literal braces.")
+        raise ValidationError(_("Use exact placeholder names or double literal braces."))
     for match in FIELD_PATTERN.finditer(value):
         if match[1] is not None and match[1] not in PLACEHOLDERS:
-            raise ValidationError("The template contains an unknown placeholder.")
+            raise ValidationError(_("The template contains an unknown placeholder."))
 
 
 def _render(template, values):
@@ -61,13 +63,47 @@ def _render(template, values):
     )
 
 
+LINK = re.compile(
+    r"""\[(?P<label>[^\]\r\n]+)\]\((?P<target>https?://[^\s<>"')]+)\)"""
+    r"""|(?P<bare>https?://[^\s<>"']+)""",
+    re.IGNORECASE,
+)
+
+
+def linked_html(body):
+    parts = []
+    offset = 0
+    for match in LINK.finditer(body):
+        parts.append(escape(body[offset:match.start()]))
+        address = match["target"] or match["bare"].rstrip(".,;:!?]")
+        if match["bare"]:
+            while address.endswith(")") and address.count(")") > address.count("("):
+                address = address[:-1]
+        try:
+            host = urlsplit(address).hostname
+        except ValueError:
+            host = None
+        if host:
+            parts.append(format_html('<a href="{}">{}</a>', address, match["label"] or address))
+            if match["bare"]:
+                parts.append(escape(match["bare"][len(address):]))
+        else:
+            parts.append(escape(match[0]))
+        offset = match.end()
+    parts.append(escape(body[offset:]))
+    return format_html(
+        '<pre style="white-space:pre-wrap;font-family:inherit">{}</pre>',
+        format_html_join("", "{}", ((part,) for part in parts)),
+    )
+
+
 @dataclass(frozen=True)
 class Message:
     subject: str
     body: str
 
     def preview_html(self):
-        return format_html("<strong>{}</strong><pre>{}</pre>", self.subject, self.body)
+        return format_html("<strong>{}</strong>{}", self.subject, linked_html(self.body))
 
 
 def render_message(subject, body, values):
@@ -77,5 +113,5 @@ def render_message(subject, body, values):
     # in the rendered subject before it can reach a mail header.
     header = " ".join(_render(subject, values).replace("\x00", "").splitlines()).strip()
     if not header:
-        raise ValidationError("The rendered subject is empty.")
+        raise ValidationError(_("The rendered subject is empty."))
     return Message(header[:300], _render(body, values))

@@ -1,0 +1,557 @@
+msgid ""
+msgstr ""
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "(inferred)"
+msgstr "(abgeleitet)"
+
+msgid "A reminder is already in progress."
+msgstr "Eine Erinnerung wird bereits verarbeitet."
+
+msgid "Action required"
+msgstr "Handlungsbedarf"
+
+msgid "Administrator fallback"
+msgstr "Ersatzadresse der Administration"
+
+msgid "Administrator fallback email"
+msgstr "Ersatzadresse der Administration"
+
+msgid "All statuses"
+msgstr "Alle Status"
+
+msgid "An audit is already active."
+msgstr "Eine Prüfung läuft bereits."
+
+msgid "Assessment"
+msgstr "Bewertung"
+
+msgid "Attendee contact details"
+msgstr "Kontaktdaten von Teilnehmenden"
+
+msgid "Attendee emails"
+msgstr "E-Mail-Adressen von Teilnehmenden"
+
+msgid "Attendee location"
+msgstr "Ortsangaben von Teilnehmenden"
+
+msgid "Attendee metadata"
+msgstr "Metadaten von Teilnehmenden"
+
+msgid "Attendee names"
+msgstr "Namen von Teilnehmenden"
+
+msgid "Audit error:"
+msgstr "Prüffehler:"
+
+msgid "Audit errors: %(scan_errors)s. Reminders requiring attention: %(mail_errors)s. Open an event to see its status and history."
+msgstr "Prüffehler: %(scan_errors)s. Erinnerungen mit Handlungsbedarf: %(mail_errors)s. Öffnen Sie eine Veranstaltung, um Status und Verlauf einzusehen."
+
+msgid "Audit findings"
+msgstr "Prüfergebnisse"
+
+msgid "Audit interval in hours"
+msgstr "Prüfintervall in Stunden"
+
+msgid "Audit queued. Refresh this page to see progress."
+msgstr "Prüfung eingeplant. Laden Sie die Seite neu, um den Fortschritt zu sehen."
+
+msgid "Audit status"
+msgstr "Prüfstatus"
+
+msgid "Audit status: %(state)s. Events checked so far: %(checked)s."
+msgstr "Prüfstatus: %(state)s. Bisher geprüfte Veranstaltungen: %(checked)s."
+
+msgid "Available placeholders:"
+msgstr "Verfügbare Platzhalter:"
+
+msgid "Awaiting audit"
+msgstr "Prüfung ausstehend"
+
+msgid "Blocked"
+msgstr "Blockiert"
+
+msgid "Cart contact fields"
+msgstr "Kontaktdaten im Warenkorb"
+
+msgid "Cart metadata"
+msgstr "Warenkorb-Metadaten"
+
+msgid "Certificate attachments"
+msgstr "Zertifikatsanhänge"
+
+msgid "Certificate logs"
+msgstr "Zertifikatsprotokolle"
+
+msgid "Checkout customer accounts"
+msgstr "Kundenkonten im Bestellvorgang"
+
+msgid "Checkout metadata"
+msgstr "Metadaten des Bestellvorgangs"
+
+msgid "Choose a future date in the event’s timezone."
+msgstr "Wählen Sie ein zukünftiges Datum in der Zeitzone der Veranstaltung."
+
+msgid "Complete a dry-run audit before approving live reminders."
+msgstr "Führen Sie einen Testlauf durch, bevor Sie den Erinnerungsversand freigeben."
+
+msgid "Complete and review a dry run before enabling reminders."
+msgstr "Führen Sie einen Testlauf durch und prüfen Sie das Ergebnis, bevor Sie Erinnerungen aktivieren."
+
+msgid "Completed"
+msgstr "Abgeschlossen"
+
+msgid "Count"
+msgstr "Anzahl"
+
+msgid "Customer accounts"
+msgstr "Kundenkonten"
+
+msgid "Customer emails"
+msgstr "E-Mail-Adressen von Kunden"
+
+msgid "Customer phones"
+msgstr "Telefonnummern von Kunden"
+
+msgid "Data Protection Monitor"
+msgstr "Datenschutzmonitor"
+
+msgid "Data protection settings"
+msgstr "Datenschutzeinstellungen"
+
+msgid "Days after completion before review"
+msgstr "Tage zwischen Veranstaltungsende und Prüfung"
+
+msgid "Days between reminders"
+msgstr "Tage zwischen Erinnerungen"
+
+msgid "Defer review"
+msgstr "Prüfung zurückstellen"
+
+msgid "Deferred"
+msgstr "Zurückgestellt"
+
+msgid "Disable reminders when changing the audit scope, then run a fresh audit."
+msgstr "Deaktivieren Sie den Erinnerungsversand, wenn Sie den Prüfumfang ändern, und starten Sie eine neue Prüfung."
+
+msgid "Double braces for literal braces."
+msgstr "Verwenden Sie doppelte geschweifte Klammern, um Klammern als Text auszugeben."
+
+msgid "Dry run"
+msgstr "Testlauf"
+
+msgid "Due"
+msgstr "Fällig"
+
+msgid "Email body"
+msgstr "E-Mail-Text"
+
+msgid "Email preview"
+msgstr "E-Mail-Vorschau"
+
+msgid "Email preview · sample data"
+msgstr "E-Mail-Vorschau · Beispieldaten"
+
+msgid "Email subject"
+msgstr "E-Mail-Betreff"
+
+msgid "Enable live reminders"
+msgstr "Erinnerungsversand aktivieren"
+
+msgid "End"
+msgstr "Ende"
+
+msgid "End date"
+msgstr "Enddatum"
+
+msgid "Enter a valid fallback email before enabling reminders."
+msgstr "Geben Sie eine gültige Ersatzadresse ein, bevor Sie den Erinnerungsversand aktivieren."
+
+msgid "Enter numeric IDs separated by spaces or commas."
+msgstr "Geben Sie numerische IDs ein, getrennt durch Leerzeichen oder Kommas."
+
+msgid "Enter positive IDs within the database ID range."
+msgstr "Geben Sie positive IDs im zulässigen Wertebereich ein."
+
+msgid "Error"
+msgstr "Fehler"
+
+msgid "Errors in the last audit: %(errors)s."
+msgstr "Fehler im letzten Prüflauf: %(errors)s."
+
+msgid "Errors requiring attention"
+msgstr "Fehler mit Handlungsbedarf"
+
+msgid "Event"
+msgstr "Veranstaltung"
+
+msgid "Event contact"
+msgstr "Veranstaltungskontakt"
+
+msgid "Events"
+msgstr "Veranstaltungen"
+
+msgid "Events checked"
+msgstr "Geprüfte Veranstaltungen"
+
+msgid "Excluded"
+msgstr "Ausgeschlossen"
+
+msgid "Excluded event IDs"
+msgstr "IDs ausgeschlossener Veranstaltungen"
+
+msgid "Excluded organizer IDs"
+msgstr "IDs ausgeschlossener Veranstalter"
+
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+msgid "Filter"
+msgstr "Filtern"
+
+msgid "Finding"
+msgstr "Befund"
+
+msgid "Generated tickets"
+msgstr "Erzeugte Tickets"
+
+msgid "Handed off"
+msgstr "Übergeben"
+
+msgid "Historical invoice data"
+msgstr "Ältere Rechnungsdaten"
+
+msgid "Historical logs"
+msgstr "Ältere Protokolle"
+
+msgid "I reviewed the completed dry-run audit and approve live reminders"
+msgstr "Ich habe den Testlauf geprüft und gebe den Erinnerungsversand frei"
+
+msgid "Identifier found"
+msgstr "Identifikator gefunden"
+
+msgid "Invoice addresses"
+msgstr "Rechnungsadressen"
+
+msgid "Invoice documents"
+msgstr "Rechnungsdokumente"
+
+msgid "Invoice line attendees"
+msgstr "Teilnehmende in Rechnungspositionen"
+
+msgid "Invoice metadata"
+msgstr "Rechnungsmetadaten"
+
+msgid "Invoice recipient fields"
+msgstr "Empfängerangaben in Rechnungen"
+
+msgid "Last checked"
+msgstr "Zuletzt geprüft"
+
+msgid "Last reminder"
+msgstr "Letzte Erinnerung"
+
+msgid "Last reminder handoff"
+msgstr "Letzte Übergabe einer Erinnerung"
+
+msgid "Last run failed: %(error)s."
+msgstr "Der letzte Prüflauf ist fehlgeschlagen: %(error)s."
+
+msgid "Last successful audit"
+msgstr "Letzte erfolgreiche Prüfung"
+
+msgid "Live reminders are disabled."
+msgstr "Der Erinnerungsversand ist deaktiviert."
+
+msgid "Live reminders enabled"
+msgstr "Erinnerungsversand aktiviert"
+
+msgid "Manual review"
+msgstr "Manuelle Prüfung"
+
+msgid "Maximum new reminders per rolling hour"
+msgstr "Maximale Anzahl neuer Erinnerungen innerhalb von 60 Minuten"
+
+msgid "Monitoring resumed."
+msgstr "Überwachung fortgesetzt."
+
+msgid "Needs review"
+msgstr "Prüfung erforderlich"
+
+msgid "Next"
+msgstr "Weiter"
+
+msgid "No events match this view."
+msgstr "Keine Veranstaltungen entsprechen diesen Filtern."
+
+msgid "No findings recorded."
+msgstr "Keine Befunde gespeichert."
+
+msgid "No known identifiers"
+msgstr "Keine bekannten Identifikatoren"
+
+msgid "No reminder history."
+msgstr "Keine Erinnerungen im Verlauf."
+
+msgid "Not due"
+msgstr "Noch nicht fällig"
+
+msgid "Occurrence"
+msgstr "Laufende Nummer"
+
+msgid "One or more IDs do not exist."
+msgstr "Mindestens eine der IDs existiert nicht."
+
+msgid "Open pretix’s personal-data deletion page"
+msgstr "pretix-Seite zum Löschen personenbezogener Daten öffnen"
+
+msgid "Order comments"
+msgstr "Bestellkommentare"
+
+msgid "Order metadata"
+msgstr "Bestellmetadaten"
+
+msgid "Organizer"
+msgstr "Veranstalter"
+
+msgid "Organizer or event"
+msgstr "Veranstalter oder Veranstaltung"
+
+msgid "Organizers checked"
+msgstr "Geprüfte Veranstalter"
+
+msgid "Other question answers"
+msgstr "Weitere Antworten auf Fragen"
+
+msgid "Outgoing customer email"
+msgstr "Ausgehende Kunden-E-Mails"
+
+msgid "Page %(number)s of %(total)s"
+msgstr "Seite %(number)s von %(total)s"
+
+msgid "Pages"
+msgstr "Seiten"
+
+msgid "Payment metadata"
+msgstr "Zahlungsmetadaten"
+
+msgid "Preview email"
+msgstr "E-Mail-Vorschau"
+
+msgid "Preview notification"
+msgstr "Benachrichtigungsvorschau"
+
+msgid "Previous"
+msgstr "Zurück"
+
+msgid "Question contact answers"
+msgstr "Kontaktdaten in Antworten"
+
+msgid "Question uploads"
+msgstr "Dateianhänge zu Fragen"
+
+msgid "Queued"
+msgstr "In der Warteschlange"
+
+msgid "Reason"
+msgstr "Grund"
+
+msgid "Recipient source"
+msgstr "Empfängerquelle"
+
+msgid "Record the retention reason without including participant details."
+msgstr "Geben Sie den Aufbewahrungsgrund ohne Angaben zu Teilnehmenden an."
+
+msgid "Refresh delivery status"
+msgstr "Versandstatus aktualisieren"
+
+msgid "Refund metadata"
+msgstr "Erstattungsmetadaten"
+
+msgid "Reminder delivery status refreshed."
+msgstr "Versandstatus aktualisiert."
+
+msgid "Reminder history"
+msgstr "Erinnerungsverlauf"
+
+msgid "Reminder submitted to the mail service."
+msgstr "Erinnerung an den Maildienst übergeben."
+
+msgid "Resume monitoring"
+msgstr "Überwachung fortsetzen"
+
+msgid "Resume on"
+msgstr "Fortsetzen am"
+
+msgid "Retrying"
+msgstr "Erneuter Versandversuch"
+
+msgid "Review deferred."
+msgstr "Prüfung zurückgestellt."
+
+msgid "Review resumes"
+msgstr "Prüfung wird fortgesetzt am"
+
+msgid "Review the notification settings before sending."
+msgstr "Prüfen Sie vor dem Versand die Benachrichtigungseinstellungen."
+
+msgid "Run audit now"
+msgstr "Prüfung jetzt starten"
+
+msgid "Running"
+msgstr "Läuft"
+
+msgid "Save settings"
+msgstr "Einstellungen speichern"
+
+msgid "Scan error"
+msgstr "Prüffehler"
+
+msgid "Send reminder"
+msgstr "Erinnerung senden"
+
+msgid "Send test email"
+msgstr "Test-E-Mail senden"
+
+msgid "Sent"
+msgstr "Gesendet"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Settings saved."
+msgstr "Einstellungen gespeichert."
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Successful dry run available for review from %(finished)s."
+msgstr "Erfolgreicher Testlauf vom %(finished)s zur Durchsicht verfügbar."
+
+msgid "Synthetic test email submitted to the mail service."
+msgstr "Test-E-Mail mit Beispieldaten an den Maildienst übergeben."
+
+msgid "The hourly reminder limit has been reached."
+msgstr "Das stündliche Limit für Erinnerungen ist erreicht."
+
+msgid "The reminder requires administrative attention."
+msgstr "Die Erinnerung muss administrativ geprüft werden."
+
+msgid "The ticket shop is still online."
+msgstr "Der Ticketshop ist noch online."
+
+msgid "This event contains test data and requires review."
+msgstr "Diese Veranstaltung enthält Testdaten und muss geprüft werden."
+
+msgid "This event is currently ineligible for a reminder."
+msgstr "Für diese Veranstaltung kann derzeit keine Erinnerung gesendet werden."
+
+msgid "This event is still within the reminder interval."
+msgstr "Das Erinnerungsintervall für diese Veranstaltung ist noch nicht abgelaufen."
+
+msgid "Uncertain schedule"
+msgstr "Unklarer Veranstaltungszeitplan"
+
+msgid "Unclassified event email"
+msgstr "Nicht zugeordnete Veranstaltungs-E-Mails"
+
+msgid "Unclassified event plugins"
+msgstr "Nicht zugeordnete Veranstaltungsplugins"
+
+msgid "Unclassified logs"
+msgstr "Nicht zugeordnete Protokolle"
+
+msgid "Unknown event action."
+msgstr "Unbekannte Veranstaltungsaktion."
+
+msgid "Unknown settings action."
+msgstr "Unbekannte Aktion in den Einstellungen."
+
+msgid "Use the organizer and event IDs shown in the dashboard to configure exclusions."
+msgstr "Verwenden Sie die IDs der Veranstalter und Veranstaltungen aus der Übersicht, um sie auszuschließen."
+
+msgid "Waiting list contacts"
+msgstr "Kontaktdaten auf der Warteliste"
+
+msgid "Waiting list voucher notes"
+msgstr "Gutscheinhinweise auf der Warteliste"
+
+msgid "Enter a template of 1 to %(limit)s characters."
+msgstr "Geben Sie eine Vorlage mit 1 bis %(limit)s Zeichen ein."
+
+msgid "This template contains unsupported control characters."
+msgstr "Diese Vorlage enthält unzulässige Steuerzeichen."
+
+msgid "Use exact placeholder names or double literal braces."
+msgstr "Verwenden Sie die genauen Platzhalternamen oder doppelte geschweifte Klammern."
+
+msgid "The template contains an unknown placeholder."
+msgstr "Die Vorlage enthält einen unbekannten Platzhalter."
+
+msgid "The rendered subject is empty."
+msgstr "Der erzeugte Betreff ist leer."
+
+msgid "Enter a valid administrator fallback email before sending a test."
+msgstr "Geben Sie vor dem Testversand eine gültige Ersatzadresse der Administration ein."
+
+msgid "Sending requires a fallback address and acknowledgment of the initial audit."
+msgstr "Der Versand erfordert eine Ersatzadresse und die Bestätigung der ersten Prüfung."
+
+msgid "Audit score"
+msgstr "Prüfpunktzahl"
+
+msgid "This organizer is excluded from the monitor."
+msgstr "Dieser Veranstalter ist von der Überwachung ausgeschlossen."
+
+msgid "Based on %(scored)s audited events you can access."
+msgstr "Grundlage: %(scored)s geprüfte Veranstaltungen, auf die Sie Zugriff haben."
+
+msgid "A clean audit earns 10 points, manual review 5, and action required 0. The score is the rounded average and only reflects supported audit checks."
+msgstr "Eine Prüfung ohne bekannte Identifikatoren ergibt 10 Punkte, eine manuelle Prüfung 5 und Handlungsbedarf 0. Die gerundete Punktzahl berücksichtigt nur die unterstützten Prüfungen."
+
+msgid "Events that are deferred, not due, unaudited, excluded, or have scan errors are omitted from the score."
+msgstr "Zurückgestellte, noch nicht fällige, ungeprüfte und ausgeschlossene Veranstaltungen sowie Veranstaltungen mit Prüffehlern fließen nicht in die Punktzahl ein."
+
+msgid "A score will appear once an eligible event you can access has been audited."
+msgstr "Eine Punktzahl erscheint, sobald eine fällige Veranstaltung geprüft wurde, auf die Sie Zugriff haben."
+
+msgid "What to review"
+msgstr "Was Sie prüfen sollten"
+
+msgid "Check whether the remaining customer or attendee data is still needed. Use pretix’s deletion tools when retention obligations allow it."
+msgstr "Prüfen Sie, ob die verbliebenen Kunden- oder Teilnehmendendaten noch benötigt werden. Verwenden Sie die Löschfunktionen von pretix, wenn die Aufbewahrungspflichten dies zulassen."
+
+msgid "Review uncertain findings and document any reason to retain data, particularly financial records."
+msgstr "Prüfen Sie unklare Befunde und dokumentieren Sie den Grund für die Aufbewahrung, insbesondere bei Finanzunterlagen."
+
+msgid "Ask your pretix administrator to investigate events with scan errors."
+msgstr "Bitten Sie Ihre pretix-Administration, Veranstaltungen mit Prüffehlern zu untersuchen."
+
+msgid "Next step"
+msgstr "Nächster Schritt"
+
+msgid "Contact your pretix administrator."
+msgstr "Wenden Sie sich an Ihre pretix-Administration."
+
+msgid "Take the ticket shop offline if the event is finished and you need to use the deletion tools."
+msgstr "Schalten Sie den Ticketshop offline, wenn die Veranstaltung beendet ist und Sie die Löschfunktionen verwenden möchten."
+
+msgid "Ask an event administrator to review this event."
+msgstr "Bitten Sie die Veranstaltungsadministration, diese Veranstaltung zu prüfen."
+
+msgid "Reminders go here if an event has no valid contact email. Test emails always go to this address."
+msgstr "Erinnerungen gehen an diese Adresse, wenn eine Veranstaltung keine gültige Kontaktadresse hat. Test-E-Mails gehen immer an diese Adresse."
+
+msgid "Paste an HTTP or HTTPS URL, or use the following syntax for a named link."
+msgstr "Fügen Sie eine HTTP- oder HTTPS-Adresse ein oder verwenden Sie die folgende Schreibweise für einen Link mit eigenem Text."
+
+msgid "Good"
+msgstr "Gut"
+
+msgid "Needs attention"
+msgstr "Prüfung empfohlen"
+
+msgid "Priority review"
+msgstr "Vorrangig prüfen"

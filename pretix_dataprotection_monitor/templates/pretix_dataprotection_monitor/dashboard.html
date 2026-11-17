@@ -1,59 +1,59 @@
 {% extends "pretixcontrol/base.html" %}
 {% load i18n %}
-{% block title %}Data Protection Monitor{% endblock %}
+{% block title %}{% translate "Data Protection Monitor" %}{% endblock %}
 {% block content %}
 <div class="clearfix">
     <div class="pull-right">
-        <a class="btn btn-default" href="{% url 'plugins:pretix_dataprotection_monitor:settings' %}"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a>
+        <a class="btn btn-default" href="{% url 'plugins:pretix_dataprotection_monitor:settings' %}"><i class="fa fa-cog" aria-hidden="true"></i> {% translate "Settings" %}</a>
         <form action="{% url 'plugins:pretix_dataprotection_monitor:run' %}" method="post" style="display:inline">
             {% csrf_token %}
-            <button class="btn btn-primary" type="submit"><i class="fa fa-refresh" aria-hidden="true"></i> Run audit now</button>
+            <button class="btn btn-primary" type="submit"><i class="fa fa-refresh" aria-hidden="true"></i> {% translate "Run audit now" %}</button>
         </form>
     </div>
-    <h1>Data Protection Monitor</h1>
+    <h1>{% translate "Data Protection Monitor" %}</h1>
 </div>
 {% if config.enabled %}
-<p><span class="label label-success">Live reminders enabled</span></p>
+<p><span class="label label-success">{% translate "Live reminders enabled" %}</span></p>
 {% else %}
-<p><span class="label label-info">Dry run</span> Live reminders are disabled.</p>
+<p><span class="label label-info">{% translate "Dry run" %}</span> {% translate "Live reminders are disabled." %}</p>
 {% endif %}
 {% if latest.active_slot %}
-<div class="alert alert-info" role="status">Audit {{ latest.get_state_display|lower }}. {{ latest.events_checked }} events checked so far.</div>
+<div class="alert alert-info" role="status">{% blocktranslate with state=run_status checked=latest.events_checked %}Audit status: {{ state }}. Events checked so far: {{ checked }}.{% endblocktranslate %}</div>
 {% elif latest.error_code %}
-<div class="alert alert-warning" role="status">Last run failed: {{ latest.error_code }}.</div>
+<div class="alert alert-warning" role="status">{% blocktranslate with error=latest.error_code %}Last run failed: {{ error }}.{% endblocktranslate %}</div>
 {% elif latest.scan_errors %}
-<div class="alert alert-warning" role="status">The last run completed with {{ latest.scan_errors }} scan errors.</div>
+<div class="alert alert-warning" role="status">{% blocktranslate with errors=latest.scan_errors %}Errors in the last audit: {{ errors }}.{% endblocktranslate %}</div>
 {% endif %}
 <div class="row">
-    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>Organizers checked</strong><h2>{{ latest.organizers_checked|default:"0" }}</h2></div></div></div>
-    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>Events checked</strong><h2>{{ checked }}</h2></div></div></div>
-    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>No known identifiers</strong><h2>{{ clean }}</h2></div></div></div>
-    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>Action required</strong><h2>{{ action }}</h2></div></div></div>
-    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>Manual review</strong><h2>{{ manual }}</h2></div></div></div>
-    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>Errors requiring attention</strong><h2>{{ scan_errors|add:mail_errors }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>{% translate "Organizers checked" %}</strong><h2>{{ latest.organizers_checked|default:"0" }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>{% translate "Events checked" %}</strong><h2>{{ checked }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>{% translate "No known identifiers" %}</strong><h2>{{ clean }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>{% translate "Action required" %}</strong><h2>{{ action }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>{% translate "Manual review" %}</strong><h2>{{ manual }}</h2></div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><strong>{% translate "Errors requiring attention" %}</strong><h2>{{ scan_errors|add:mail_errors }}</h2></div></div></div>
 </div>
-<p><strong>Last successful audit</strong> {{ successful.finished_at|date:"SHORT_DATETIME_FORMAT"|default:"—" }} &nbsp; <strong>Last reminder handoff</strong> {{ last_mail|date:"SHORT_DATETIME_FORMAT"|default:"—" }}</p>
+<p><strong>{% translate "Last successful audit" %}</strong> {{ successful.finished_at|date:"SHORT_DATETIME_FORMAT"|default:"—" }} &nbsp; <strong>{% translate "Last reminder handoff" %}</strong> {{ last_mail|date:"SHORT_DATETIME_FORMAT"|default:"—" }}</p>
 {% if scan_errors or mail_errors %}
-<p>{{ scan_errors }} scan errors and {{ mail_errors }} reminders requiring attention. Open an event to see its status and history.</p>
+<p>{% blocktranslate %}Audit errors: {{ scan_errors }}. Reminders requiring attention: {{ mail_errors }}. Open an event to see its status and history.{% endblocktranslate %}</p>
 {% endif %}
-<h2>Events</h2>
+<h2>{% translate "Events" %}</h2>
 <form method="get" class="form-inline" style="margin-bottom:15px">
     <div class="form-group">
-        <label for="monitor-q">Organizer or event</label>
+        <label for="monitor-q">{% translate "Organizer or event" %}</label>
         <input id="monitor-q" type="search" class="form-control" name="q" value="{{ query }}">
     </div>
     <div class="form-group">
-        <label for="monitor-status">Status</label>
+        <label for="monitor-status">{% translate "Status" %}</label>
         <select id="monitor-status" name="status" class="form-control">
-            <option value="">All statuses</option>
+            <option value="">{% translate "All statuses" %}</option>
             {% for value, label in status_choices %}<option value="{{ value }}"{% if selected == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
         </select>
     </div>
-    <button type="submit" class="btn btn-default">Filter</button>
+    <button type="submit" class="btn btn-default">{% translate "Filter" %}</button>
 </form>
 <div class="table-responsive">
 <table class="table table-striped">
-    <thead><tr><th scope="col">Organizer</th><th scope="col">Event</th><th scope="col">End date</th><th scope="col">Audit status</th><th scope="col">Last reminder</th></tr></thead>
+    <thead><tr><th scope="col">{% translate "Organizer" %}</th><th scope="col">{% translate "Event" %}</th><th scope="col">{% translate "End date" %}</th><th scope="col">{% translate "Audit status" %}</th><th scope="col">{% translate "Last reminder" %}</th></tr></thead>
     <tbody>
     {% for state in page %}
     <tr>
@@ -64,7 +64,7 @@
         <td>{{ state.last_reminder|date:"j M Y"|default:"—" }}</td>
     </tr>
     {% empty %}
-    <tr><td colspan="5">No events match this view.</td></tr>
+    <tr><td colspan="5">{% translate "No events match this view." %}</td></tr>
     {% endfor %}
     </tbody>
 </table>

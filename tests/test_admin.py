@@ -17,6 +17,18 @@ pytestmark = pytest.mark.django_db
 PREFIX = "plugins:pretix_dataprotection_monitor:"
 
 
+@pytest.fixture(autouse=True)
+def monitor_static_manifest(monkeypatch):
+    from django.contrib.staticfiles import finders
+    from django.contrib.staticfiles.storage import staticfiles_storage
+
+    asset = "pretix_dataprotection_monitor/score.css"
+    assert finders.find(asset)
+    # The test runtime ships pretix's manifest. The monitor is collected
+    # separately during the custom production image build.
+    monkeypatch.setitem(staticfiles_storage.hashed_files, asset, asset)
+
+
 def url(name, event_id=None):
     return reverse(PREFIX + name, kwargs={"event_id": event_id} if event_id else None)
 
@@ -207,3 +219,114 @@ def test_rendered_dashboard_links_and_audit_button(admin, event, django_capture_
         result = admin.post(run_form["action"], follow=True)
     assert result.status_code == 200
     assert AuditRun.objects.get().state == AuditRun.State.COMPLETED
+
+
+def test_german_monitor_labels_follow_admin_language(admin, event):
+    user = User.objects.get(email="admin@example.invalid")
+    user.locale = "de"
+    user.save(update_fields=["locale"])
+    EventAuditState.objects.create(
+        event=event, status=Status.ACTION_REQUIRED,
+        identifiers={"attendee_names": 1}, checked_at=timezone.now(),
+    )
+    dashboard = admin.get(url("dashboard"), HTTP_ACCEPT_LANGUAGE="de").content.decode()
+    assert "Datenschutzmonitor" in dashboard
+    assert "Prüfung jetzt starten" in dashboard
+    assert "Handlungsbedarf" in dashboard
+    settings = admin.get(url("settings"), HTTP_ACCEPT_LANGUAGE="de").content.decode()
+    assert "Datenschutzeinstellungen" in settings
+    assert "E-Mail-Betreff" in settings
+    details = admin.get(url("event", event.pk), HTTP_ACCEPT_LANGUAGE="de").content.decode()
+    assert "Namen von Teilnehmenden" in details
+    assert "Prüfung zurückstellen" in details
+    assert "Audit fixture" in details
+
+
+def test_organizer_score_and_shredder_links_are_permission_scoped(client, event):
+    from django_scopes import scopes_disabled
+    from pretix.base.models import Event, Organizer, Team
+
+    with scopes_disabled():
+        second = Event.objects.create(
+            organizer=event.organizer, slug="second", name="Clean accessible event",
+            date_from=event.date_from, date_to=event.date_to,
+        )
+        hidden = Event.objects.create(
+            organizer=event.organizer, slug="hidden", name="Hidden event",
+            date_from=event.date_from, date_to=event.date_to,
+        )
+        other_org = Organizer.objects.create(name="Other organizer", slug="other-organizer")
+        other_event = Event.objects.create(
+            organizer=other_org, slug="other-event", name="Other organizer event",
+            date_from=event.date_from, date_to=event.date_to,
+        )
+        team = Team.objects.create(
+            organizer=event.organizer, name="Organizer leads",
+            limit_organizer_permissions={"organizer.settings.general:write": True},
+            limit_event_permissions={"event.orders:write": True},
+        )
+        user = User.objects.create_user("lead@example.invalid", password="fixture password")
+        team.members.add(user)
+        team.limit_events.add(event, second)
+    for fixture, status in (
+        (event, Status.ACTION_REQUIRED), (second, Status.NO_KNOWN_IDENTIFIERS),
+        (hidden, Status.ACTION_REQUIRED), (other_event, Status.ACTION_REQUIRED),
+    ):
+        EventAuditState.objects.create(event=fixture, status=status, checked_at=timezone.now())
+    client.force_login(user)
+    path = reverse(PREFIX + "organizer", kwargs={"organizer": event.organizer.slug})
+    organizer_home = client.get(reverse("control:organizer", kwargs={"organizer": event.organizer.slug}))
+    assert path in organizer_home.content.decode()
+    response = client.get(path)
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "5 / 10" in content
+    assert "Hidden event" not in content
+    assert "Other organizer event" not in content
+    shredder = reverse("control:event.shredder.start", kwargs={"organizer": event.organizer.slug, "event": event.slug})
+    assert shredder in content
+    assert client.get(reverse(PREFIX + "organizer", kwargs={"organizer": other_org.slug})).status_code == 404
+    assert client.get(url("dashboard")).status_code == 403
+    team.limit_event_permissions = {"event.orders:read": True}
+    team.save(update_fields=["limit_event_permissions"])
+    content = client.get(path).content.decode()
+    assert "5 / 10" in content
+    assert shredder not in content
+    assert "Ask an event administrator" in content
+
+
+def test_settings_places_preview_and_controls_beside_body(admin):
+    response = admin.post(url("settings"), settings_data(
+        action="preview", body="Read [the guide](https://example.org/guide)",
+    ))
+    content = response.content.decode()
+    markers = ['id="id_body"', "Available placeholders:", "Preview email", "Send test email",
+               "Email preview", 'id="id_administrator_email"']
+    positions = [content.index(marker) for marker in markers]
+    assert positions == sorted(positions)
+    assert "Reminders go here if an event has no valid contact email." in content
+    assert '<a href="https://example.org/guide">the guide</a>' in content
+
+
+@pytest.mark.parametrize(("status", "score", "rating", "pulse"), [
+    (Status.NO_KNOWN_IDENTIFIERS, 10, "good", False),
+    (Status.MANUAL_REVIEW, 5, "fair", False),
+    (Status.ACTION_REQUIRED, 0, "poor", True),
+    (Status.NOT_DUE, None, "unrated", False),
+])
+def test_organizer_rating_color_and_sidebar_pulse(admin, event, status, score, rating, pulse):
+    EventAuditState.objects.create(event=event, status=status, checked_at=timezone.now())
+    organizer = {"organizer": event.organizer.slug}
+    response = admin.get(reverse(PREFIX + "organizer", kwargs=organizer))
+    assert response.status_code == 200
+    assert response.context["score"] == score
+    assert response.context["rating"] == rating
+    content = response.content.decode()
+    if score is not None:
+        assert f"dp-monitor-score-{rating}" in content
+    else:
+        assert "A score will appear" in content
+    home = admin.get(reverse("control:organizer", kwargs=organizer)).content.decode()
+    assert ('class="dp-monitor-attention"' in home) is pulse
+    if pulse:
+        assert "pretix_dataprotection_monitor/score.css" in home

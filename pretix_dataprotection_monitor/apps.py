@@ -7,7 +7,7 @@ class DataProtectionMonitorApp(PluginConfig):
     class PretixPluginMeta:
         name = "Data Protection Monitor"
         author = "SWD-EC"
-        version = "0.4.0"
+        version = "0.5.1"
         description = "Installation-wide read-only audit of completed events."
         category = "FEATURE"
         visible = False
