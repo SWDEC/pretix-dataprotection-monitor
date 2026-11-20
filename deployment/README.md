@@ -44,7 +44,7 @@ to `FROM pretix/standalone:2026.9.2` so the build uses the tested release.
 
 ```dockerfile
 RUN env -u DJANGO_SETTINGS_MODULE python -m pip install --no-cache-dir --no-deps \
-    "pretix-dataprotection-monitor @ git+https://github.com/SWDEC/pretix-dataprotection-monitor.git@v0.5.2" \
+    "pretix-dataprotection-monitor @ git+https://github.com/SWDEC/pretix-dataprotection-monitor.git" \
     && python -m pip check
 ```
 
