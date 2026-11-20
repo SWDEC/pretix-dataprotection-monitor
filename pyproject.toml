@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pretix-dataprotection-monitor"
-version = "0.5.2"
+version = "0.5.3"
 description = "Read-only data protection auditing for pretix"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
-dependencies = ["pretix>=2026.9.1,<=2026.9.2"]
+dependencies = ["pretix>=2026.9.1"]
 
 [project.entry-points."pretix.plugin"]
 pretix_dataprotection_monitor = "pretix_dataprotection_monitor:PretixPluginMeta"
