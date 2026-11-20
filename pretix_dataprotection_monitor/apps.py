@@ -11,7 +11,7 @@ class DataProtectionMonitorApp(PluginConfig):
         description = "Installation-wide read-only audit of completed events."
         category = "FEATURE"
         visible = False
-        compatibility = "pretix>=2026.9.1,<=2026.9.2"
+        compatibility = "pretix>=2026.9.1"
 
     def ready(self):
         from . import runs, scheduler, signals  # noqa: F401
